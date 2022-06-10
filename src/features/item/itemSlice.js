@@ -17,31 +17,12 @@ const initialState = {
 // get top artists
 export const getTop = createAsyncThunk(
     "item/getTop",
-    async (type, thunkAPI) => {
+    async (data, thunkAPI) => {
         try {
-            const token = thunkAPI.getState().user.user;
+            const token = thunkAPI.getState().user.user.accessToken;
+            const { type, timeRange } = data;
             const { limit, offset } = thunkAPI.getState().item;
-            return await itemService.getTop({type, limit, offset}, token);
-        } catch (error) {
-            const message =
-                (error.response &&
-                    error.response.data &&
-                    error.response.data.msg) ||
-                error.message ||
-                error.toString();
-            return thunkAPI.rejectWithValue(message);
-        }
-    }
-);
-
-
-// get top songs
-export const getTopSongs = createAsyncThunk(
-    "item/getTopSongs",
-    async (_, thunkAPI) => {
-        try {
-            const token = thunkAPI.getState().user.user;
-            return await itemService.getTopSongs(token);
+            return await itemService.getTop({type, timeRange, offset, limit, offset}, token);
         } catch (error) {
             const message =
                 (error.response &&

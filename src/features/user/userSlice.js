@@ -20,7 +20,7 @@ export const getProfile = createAsyncThunk(
     'user/getProfile',
     async (_, thunkAPI) => {
         try {
-            const token = thunkAPI.getState().user.user;
+            const token = thunkAPI.getState().user.user.accessToken;
             return await userService.getProfile(token);
         } catch (error) {
             const message =
@@ -48,7 +48,21 @@ const userSlice = createSlice({
         },
         setUser: (state, action) => {
             state.user = action.payload;
-            localStorage.setItem("user", JSON.stringify(action.payload));
+            const user = localStorage.getItem("user");
+            if (user) {
+                user.accessToken = action.payload.accessToken;
+                user.expiresIn = action.payload.expiresIn;
+                user.loginTime = Date.now();
+                localStorage.setItem("user", JSON.stringify(user));
+            } else {
+                const newUser = {
+                    accessToken: action.payload.accessToken,
+                    expiresIn: action.payload.expiresIn,
+                    loginTime: Date.now()
+                }
+
+                localStorage.setItem("user", JSON.stringify(newUser));
+            }
         }
     }, 
     extraReducers: (builder) => {

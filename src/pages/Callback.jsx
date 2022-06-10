@@ -13,7 +13,12 @@ const Callback = () => {
         if(hash.startsWith('#access_token=')) {
             console.log('hash', hash);
             const accessToken = hash.split('=')[1].replace('&token_type', '');
-            dispatch(setUser(accessToken));
+            const expiresIn = hash.split('expires_in=')[1]
+            const user = {
+                accessToken,
+                expiresIn,
+            }
+            dispatch(setUser(user));
             navigate('/');
         } else {
             navigate('/');

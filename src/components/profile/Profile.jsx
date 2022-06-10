@@ -1,18 +1,31 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getProfile } from "../../features/user/userSlice";
 import { getTop, reset } from "../../features/item/itemSlice";
-import { CircularProgress } from "@mui/material"
+import { CircularProgress, InputLabel, Select, MenuItem, FormControl } from "@mui/material"
 import { TabsBar, SongItem, ArtistItem } from '../';
 
 
 const Profile = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const { items, isLoading, hasMore } = useSelector(state => state.item);
     const [tab, setTab] = useState(0);
-    const { profile } = useSelector(state => state.user);
+    const { profile, user } = useSelector(state => state.user);
+    const [timeRange, setTimeRange] = useState('medium_term');
 
     useEffect(() => {
+        // Check if expires_in is already expired
+        if (user.expiresIn && user.loginTime && ((+user.expiresIn * 1000) + user.loginTime) < Date.now()) {
+            console.log("Token expired");
+            localStorage.removeItem('user');
+            localStorage.removeItem('profile');
+            navigate('/');
+        } else {
+            console.log('Token will expire in', ((Date.now() - ((+user.expiresIn * 1000) + user.loginTime))/1000) / 60, 'minutes');
+        }
+
         if(!profile) {
             dispatch(getProfile());
         }
@@ -20,9 +33,9 @@ const Profile = () => {
 
     const getData = () => {
         if (tab === 0) {
-            return dispatch(getTop('artists'));
+            return dispatch(getTop({type: 'artists', timeRange: timeRange}));
         } else if (tab === 1) {
-            return dispatch(getTop('tracks'));
+            return dispatch(getTop({type: 'tracks', timeRange: timeRange}));
         }
     }
 
@@ -51,7 +64,7 @@ const Profile = () => {
             promise && promise.abort();
             dispatch(reset());
         }
-    }, [tab]);
+    }, [tab, timeRange]);
 
     return (
         profile &&
@@ -81,6 +94,24 @@ const Profile = () => {
                 setValue={setTab}
             />
             <div className="mt">
+                <div className="flex flex-end">
+                    <FormControl fullWidth>
+                        <InputLabel id="demo-simple-select-label">Time Range</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={timeRange}
+                            label="Time Range"
+                            onChange={(e) => {
+                                setTimeRange(e.target.value);
+                            }}
+                        >
+                            <MenuItem value={'short_term'}>Short (~4 weeks)</MenuItem>
+                            <MenuItem value={'medium_term'}>Medium (~6 month)</MenuItem>
+                            <MenuItem value={'long_term'}>Long (~years)</MenuItem>
+                        </Select>
+                    </FormControl>
+                </div>
                 {tab === 0 ? 
                 items && items.map((item, index) => {
                     if(items.length === index + 1) {
@@ -99,7 +130,7 @@ const Profile = () => {
                 })
                 : null}
                 {isLoading &&
-                <div className="flex justify-center">
+                <div className="flex justify-center mt">
                     <CircularProgress />
                 </div>
                 }

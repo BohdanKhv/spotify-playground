@@ -10,7 +10,8 @@ const getTop = async (data, token) => {
             Authorization: `Bearer ${token}`,
         }
     };
-    const response = await axios.get(`${API_URL}top/${data.type}?limit=${data.limit}&offset=${data.offset}`, config);
+    console.log(data)
+    const response = await axios.get(`${API_URL}top/${data.type}?limit=${data.limit}&offset=${data.offset}&time_range=${data.timeRange}`, config);
     return response.data;
 }
 

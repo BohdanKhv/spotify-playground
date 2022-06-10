@@ -49,6 +49,16 @@
     display: none;
 }
 
+.pause,
+.playing .play {
+    display: none;
+}
+
+.play,
+.playing .pause {
+    display: block;
+}
+
 @media (max-width: 768px) {
     .card {
         /* height: 150px; */

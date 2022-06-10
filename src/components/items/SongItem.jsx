@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSelector } from "react-redux"
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PauseCircle from '@mui/icons-material/PauseCircle';
@@ -6,8 +6,8 @@ import { IconButton } from "@mui/material";
 import './style.css'
 
 const SongItem = ({item}) => {
-    const audio = useRef();
-    const [play, setPlay] = useState(false);
+    const audio = useRef(null);
+    const audioPar = useRef(null);
 
     return (
         <>
@@ -25,7 +25,7 @@ const SongItem = ({item}) => {
                             <h5 className="card-title">{item?.name}</h5>
                             <h5 className="card-secondary">{item?.artists?.length > 0 && item?.artists[0].name}</h5>
                         </div>
-                        <div className="flex justify-between align-center">
+                        <div className="flex justify-between align-center" ref={audioPar}>
                             <div className="title-2 text-secondary">
                                 {item?.duration_ms && `${Math.floor(item?.duration_ms / 60000)}:${Math.floor((item?.duration_ms % 60000) / 1000) < 10 ? '0' : ''}${Math.floor((item?.duration_ms % 60000) / 1000)}`}
                             </div>
@@ -34,22 +34,34 @@ const SongItem = ({item}) => {
                                 size="large"
                                 aria-label="play/pause"
                                 onClick={() => {
-                                    if (play) {
+                                    if (audioPar.current.classList.contains('playing')) {
                                         audio.current.pause();
-                                        setPlay(false);
+                                        audio.current.currentTime = 0;
+                                        audioPar.current.classList.remove('playing');
                                     }
                                     else {
+                                        if(document.querySelector('.playing')) {
+                                            console.log(document.querySelector('.playing audio'));
+                                            document.querySelector('.playing audio').pause()
+                                            document.querySelector('.playing audio').currentTime = 0;
+                                            document.querySelector('.playing').classList.remove('playing')
+                                        }
                                         audio.current.play();
-                                        setPlay(true);
+                                        audioPar.current.classList.add('playing');
                                     }
                                 }}
                             >
-                                {play ? <PauseCircle sx={{fontSize: '80px'}} /> : <PlayArrowIcon sx={{fontSize: '80px'}} />}
+                                <span className="play">
+                                    <PlayArrowIcon sx={{fontSize: '80px'}}  />
+                                </span>
+                                <span className="pause">
+                                    <PauseCircle sx={{fontSize: '80px'}}  />
+                                </span>
                             </IconButton>
+                            <audio ref={audio}>
+                                <source src={item.preview_url} type="audio/mpeg" />
+                            </audio>
                         </div>
-                        <audio controls ref={audio}>
-                            <source src={item.preview_url} type="audio/mpeg" />
-                        </audio>
                     </div>
                 </div>
             </div>

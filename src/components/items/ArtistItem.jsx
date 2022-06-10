@@ -18,7 +18,7 @@ const ArtistItem = ({item}) => {
                 <div className="flex flex-column h-100 justify-between">
                     <div>
                         <h5 className="card-title">{item?.name}</h5>
-                        <h5 className="card-secondary">{item?.followers?.total} followers</h5>
+                        <h5 className="card-secondary">{item?.followers?.total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} followers</h5>
                         <h5 className="card-secondary">{item?.popularity} popularity</h5>
                     </div>
                     <div className="flex flex-wrap">
