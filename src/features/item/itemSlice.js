@@ -36,6 +36,26 @@ export const getTop = createAsyncThunk(
 );
 
 
+// get top artists
+export const playlist = createAsyncThunk(
+    "item/palylist",
+    async (_, thunkAPI) => {
+        try {
+            const token = thunkAPI.getState().user.user.accessToken;
+            return await itemService.playlist(token);
+        } catch (error) {
+            const message =
+                (error.response &&
+                    error.response.data &&
+                    error.response.data.msg) ||
+                error.message ||
+                error.toString();
+            return thunkAPI.rejectWithValue(message);
+        }
+    }
+);
+
+
 
 // create slice
 const itemSlice = createSlice({
@@ -70,6 +90,35 @@ const itemSlice = createSlice({
             state.hasMore = state.offset + state.limit < state.total;
         });
         builder.addCase(getTop.rejected, (state, action) => {
+            state.isLoading = false;
+            state.isError = true;
+            state.msg = action.payload;
+        });
+
+        // playlist
+        builder.addCase(playlist.pending, (state, action) => {
+            state.isLoading = true;
+            state.isError = false;
+            state.msg = "";
+        });
+        builder.addCase(playlist.fulfilled, (state, action) => {
+            state.items = action.payload.items.map(item => item.track);
+            const data = [];
+            action.payload.items.forEach(item => {
+                data.push({
+                    artist: item.track.artists[0].name,
+                    name: item.track.name,
+                    image: item.track.album.images[0].url,
+                    id: item.track.id,
+                    preview: item.track.preview_url
+                });
+            });
+            console.log(data)
+            state.isLoading = false;
+            state.isError = false;
+            state.msg = "";
+        });
+        builder.addCase(playlist.rejected, (state, action) => {
             state.isLoading = false;
             state.isError = true;
             state.msg = action.payload;

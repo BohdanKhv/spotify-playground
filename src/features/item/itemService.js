@@ -15,9 +15,21 @@ const getTop = async (data, token) => {
     return response.data;
 }
 
+const playlist = async (token) => {
+    const config = {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        }
+    };
+    const aplaylistId = '7IwsTX2xGq3Qcg8BSUaURY';
+    const response = await axios.get(`https://api.spotify.com/v1/playlists/${aplaylistId}/tracks`, config);
+    return response.data;
+}
+
 
 const itemService = {
-    getTop
+    getTop,
+    playlist
 }
 
 export default itemService;

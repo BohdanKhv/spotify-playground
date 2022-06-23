@@ -41,7 +41,6 @@ const SongItem = ({item}) => {
                                     }
                                     else {
                                         if(document.querySelector('.playing')) {
-                                            console.log(document.querySelector('.playing audio'));
                                             document.querySelector('.playing audio').pause()
                                             document.querySelector('.playing audio').currentTime = 0;
                                             document.querySelector('.playing').classList.remove('playing')

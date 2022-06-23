@@ -14,6 +14,7 @@ const TabsBar = ({value, setValue}) => {
                 <Tabs value={value} onChange={handleChange} centered>
                     <Tab label="Top Artists" />
                     <Tab label="Top Tracks" />
+                    <Tab label="Playlist" />
                 </Tabs>
             </Box>
         </div>

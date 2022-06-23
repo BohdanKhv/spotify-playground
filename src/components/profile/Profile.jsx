@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getProfile } from "../../features/user/userSlice";
-import { getTop, reset } from "../../features/item/itemSlice";
+import { getTop, playlist, reset } from "../../features/item/itemSlice";
 import { CircularProgress, InputLabel, Select, MenuItem, FormControl } from "@mui/material"
 import { TabsBar, SongItem, ArtistItem } from '../';
 
@@ -36,6 +36,8 @@ const Profile = () => {
             return dispatch(getTop({type: 'artists', timeRange: timeRange}));
         } else if (tab === 1) {
             return dispatch(getTop({type: 'tracks', timeRange: timeRange}));
+        } else if (tab === 2) {
+            return dispatch(playlist());
         }
     }
 
@@ -120,7 +122,7 @@ const Profile = () => {
                         return <ArtistItem key={index} item={item}/>
                     }
                 })
-                : tab === 1 ?
+                : tab === 1 || tab === 2 ?
                 items && items.map((item, index) => {
                     if(items.length === index + 1) {
                         return <div ref={lastElementRef} key={index}><SongItem item={item}/></div>
